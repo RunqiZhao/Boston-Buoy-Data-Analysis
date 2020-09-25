@@ -8,8 +8,6 @@ url2 <- ".txt.gz&dir=data/historical/stdmet/"
 years <- c(1987:2019)
 urls <- str_c(url1, years, url2, sep = "")
 
-# filenames <- str_c("mr", years,sep ="")
-
 #### read table
 ## download data
 # 87-98 original: 16 variables | data1 15 variables

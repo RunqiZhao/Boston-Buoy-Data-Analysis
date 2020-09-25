@@ -17,20 +17,32 @@ library(GGally)
 ## Download Data
 
 Download Historical data from NOAA National Data Buoy Center. Read data ofNDBC Station 44013, years from 1987 to 2019.
-Because these txt files have different column names, the initial data is separated into 5 data frames. 
+ 
 ```{r include=FALSE}
-# echo=FALSE
 url1 <- "https://www.ndbc.noaa.gov/view_text_file.php?filename=44013h"
 url2 <- ".txt.gz&dir=data/historical/stdmet/"
 years <- c(1987:2019)
 urls <- str_c(url1, years, url2, sep = "")
+```
 
+Because these txt files have different column names, the initial data is separated into 5 data frames.
+Take 1987 - 1998 as example. Their original column names are:
+```{r include=FALSE}
 # 87-98 original: 16 variables | data1 15 variables
-merge.data1 <-read_table2(urls[1],col_names = TRUE,)
+merge.data1 <-read_table2(urls[1],col_names = TRUE)
 for (i in 2:12){
   new.data <- read_table2(urls[i],col_names = TRUE)
   merge.data1 <- rbind(merge.data1,new.data)
 }
+```
+
+```{r}
+colnames(merge.data1)
+```
+
+Combine its date variables into DATE, and time variables into TIME, Add an new variable as MONTH for future group.
+
+```{r include=FALSE}
 
 YY <- rep("19",nrow(merge.data1))
 mm <- rep("00",nrow(merge.data1))
@@ -39,10 +51,17 @@ DATE <- ymd(DATE)
 MONTH <- round_date(DATE, "month")
 TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data1$hh))
-merge.data1 <- merge.data1[,-c(1:4)]
-merge.data1 <- cbind(DATE,MONTH,TIME,merge.data1)
-head(merge.data1)
 
+merge.data1 <- merge.data1[,-c(1:4)]
+merge.data1 <- cbind(DATE,MONTH,merge.data1)
+```
+
+```{r}
+colnames(merge.data1)
+```
+
+Do the same with the next 4 data frames.
+```{r include=FALSE}
 # 99 original: 16 variables | data2 15 variables
 merge.data2 <-read_table2(urls[13],col_names = TRUE)
 mm <- rep("00",nrow(merge.data2))
@@ -52,8 +71,7 @@ MONTH <- round_date(DATE, "month")
 TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data2$hh))
 merge.data2 <- merge.data2[,-c(1:4)]
-merge.data2 <- cbind(DATE,MONTH,TIME,merge.data2)
-head(merge.data2)
+merge.data2 <- cbind(DATE,MONTH,merge.data2)
 
 # 00-04 original: 17 variables | data3 16 variables
 merge.data3 <-read_table2(urls[14],col_names = TRUE)
@@ -70,7 +88,7 @@ TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data3$hh))
 
 merge.data3 <- merge.data3[,-c(1:4)]
-merge.data3 <- cbind(DATE,MONTH,TIME,merge.data3)
+merge.data3 <- cbind(DATE,MONTH,merge.data3)
 
 
 # 05-06 original: 17 variables | data4 16 variables
@@ -87,7 +105,7 @@ TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data4$hh))
 
 merge.data4 <- merge.data4[,-c(1:5)]
-merge.data4 <- cbind(DATE,MONTH,TIME,merge.data4)
+merge.data4 <- cbind(DATE,MONTH,merge.data4)
 
 
 # 07-19 original: 17 variables | data5 16 variables
@@ -108,43 +126,16 @@ TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data5$hh))
 
 merge.data5 <- merge.data5[,-c(1:5)]
-merge.data5 <- cbind(DATE,MONTH,TIME,merge.data5)
-```
-
-Data of 1987-1998 (15 variables, first 6 lines)
-```{r echo=FALSE}
-head(merge.data1)
-```
-
-Data of 1999 (15 variables, first 6 lines)
-```{r echo=FALSE}
-head(merge.data2)
-```
-
-Data of 2000-2004 (16 variables, first 6 lines)
-```{r echo=FALSE}
-head(merge.data3)
-```
-
-Data of 2005-2006 (16 variables, first 6 lines)
-```{r echo=FALSE}
-head(merge.data4)
-```
-
-Data of 2007-2019(16 variables, first 6 lines)
-```{r echo=FALSE}
-head(merge.data4)
+merge.data5 <- cbind(DATE,MONTH,merge.data5)
 ```
 
 ## Combine data frames.
-
+After change the date and time variables, we can combine 5 data frames into 3. Print the column names to find the difference.
 ```{r echo=FALSE}
 data_87_99 <- rbind(merge.data1,merge.data2)
 data_00_06 <- rbind(merge.data3,merge.data4)
 data_07_19 <- merge.data5
 ```
-
-Print the colnames to find the difference.
 
 ```{r echo=FALSE}
 colnames(data_87_99)
@@ -152,39 +143,40 @@ colnames(data_00_06)
 colnames(data_07_19)
 ```
 
-From the defination, we find the "BAR" is the historic name of "PRES". Change the column name.
+From the definition on NOAA National Data Buoy Center Website, we find the "BAR" is the historic name of "PRES". Change the column name for data before 2007.
 
 ```{r echo=TRUE}
 names(data_87_99)[names(data_87_99)=="BAR"]="PRES"
 names(data_00_06)[names(data_00_06)=="BAR"]="PRES"
 ```
 
-Add NA for TIDE, WDIR and WD for the data frame to make their names as each other. Then combine the data frames into one.
+Add NA for TIDE, WDIR and WD to the data frame as a missing value to make their names as each other. Then combine the data frames into one.
 
-```{r echo=TRUE}
+```{r include=FALSE}
+
 TIDE <- rep(NA,nrow(data_87_99))
 data_87_99<-cbind(data_87_99,TIDE)
 
 WDIR <- rep(NA,nrow(data_87_99))
-data_87_99<-cbind(data_87_99[,1:4],WDIR,data_87_99[,5:16])
+data_87_99<-cbind(data_87_99[,1:3],WDIR,data_87_99[,4:15])
 WDIR <- rep(NA,nrow(data_00_06))
-data_00_06<-cbind(data_00_06[,1:4],WDIR,data_00_06[,5:16])
+data_00_06<-cbind(data_00_06[,1:3],WDIR,data_00_06[,4:15])
 WD <- rep(NA,nrow(data_07_19))
-data_07_19<-cbind(data_07_19[,1:3],WD,data_07_19[,4:16])
-
-
-data_87_19 <- rbind(data_87_99,data_00_06,data_07_19)
-
+data_07_19<-cbind(data_07_19[,1:2],WD,data_07_19[,3:15])
 ```
 
 ```{r}
+data_87_19 <- rbind(data_87_99,data_00_06,data_07_19)
+```
+
+```{r include=FALSE}
 str(data_87_19)
 ```
 
-Conver the data from character into numeric.
+Convert the data from character into numeric.
 
 ```{r echo=FALSE}
-for (i in 4:17){
+for (i in 3:16){
   data_87_19[,i] <- as.numeric(data_87_19[,i])
 }
 ```
@@ -193,11 +185,12 @@ for (i in 4:17){
 str(data_87_19)
 ```
 
+There are some data like "9999", "999", "99", which seems impossible value. They are actually missing value. Replace them with NA. 
+
 ```{r}
 summary(data_87_19,na.rm = TRUE)
 ```
 
-There are some data like "9999", "999", "99", there are actually NA. Replace them with NA. 
 
 ```{r echo=FALSE}
 data_87_19$WD[data_87_19$WD==999] <- NA
@@ -226,4 +219,28 @@ Save data as BuoyData.Rdata
 ```{r}
 save(data_87_19,file='BuoyData.Rdata')
 ```
+
+# Data Select
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

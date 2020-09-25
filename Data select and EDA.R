@@ -1,10 +1,11 @@
 # MA615 Boston-Buoy-Data-Analysis
 # Data select and EDA
+library(Rmisc)
 library(tidyverse)
 library(corrplot)
 library(lubridate)
 library(GGally)
-library(Rmisc)
+
 
 load("BuoyData.Rdata")
 tmpdata  <-  data_87_19[ , !names(data_87_19) %in% c("WD","WDIR","MWD","VIS","TIDE","DEWP")]
@@ -53,14 +54,8 @@ delay4  <-  summarise(planes4, WSPD = mean(WSPD, na.rm = TRUE),
                       ATMP = mean(ATMP, na.rm = TRUE), 
                       WTMP = mean(WTMP, na.rm = TRUE))
 
-<<<<<<< HEAD
-cor_de <- cor(delay3[,2:9])
-=======
-
 # correlation
 cor_de <- cor(delay4[,2:9])
->>>>>>> c06cc2f347c9dd53a48ebea09b57959b912002de
-
 res_cor <- cor(cor_de)
 corrplot(corr=res_cor)
 
@@ -80,8 +75,8 @@ ggscatmat(smdata) + theme_bw(base_family = "STKaiti") +
   labs(x = "",y = "")
 
 ## plot selected coefficient verses ATMP 
-fit1 <- lm(data = delay4, ATMP ~ WSPD)
-p1 <- ggplot(data = delay4, aes(WSPD, ATMP))+
+fit1 <- lm(data = delay3, ATMP ~ WSPD)
+p1 <- ggplot(data = delay3, aes(WSPD, ATMP))+
           geom_point()+
           geom_abline(intercept = coef(fit1)[1],
                     slope = coef(fit1)[2])+

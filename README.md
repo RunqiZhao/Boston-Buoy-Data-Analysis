@@ -10,4 +10,4 @@ Date select and analysis(R.script):
 
 HTML file: 
 
-PDF: 
+PDF: https://github.com/RunqiZhao/Boston-Buoy-Data-Analysis/blob/master/Boston-Buoy-Data-Analysis.pdf

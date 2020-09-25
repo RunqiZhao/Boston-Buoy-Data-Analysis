@@ -2,7 +2,9 @@
 title: "Boston-Buoy-Data-Analysis"
 author: "RickyZhao"
 date: "9/24/2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -324,30 +326,30 @@ Plot the relationship between ATMP and WSPD, GST, WVHT and DPD with ggplot.
 ```{r echo=FALSE}
 fit1 <- lm(data = delay3, ATMP ~ WSPD)
 p1 <- ggplot(data = delay3, aes(WSPD, ATMP))+
-          geom_point()+
+          geom_point(col = 'orange', alpha = 0.5, cex = 0.75)+
           geom_abline(intercept = coef(fit1)[1],
-                    slope = coef(fit1)[2])+
+                    slope = coef(fit1)[2], col = "gray", lwd = 1.25)+
         labs(x = "WSPD", y = "ATMP")
 
 fit2 <- lm(data = delay3, ATMP ~ GST)
 p2 <- ggplot(data = delay3, aes(GST, ATMP))+
-          geom_point()+
+          geom_point(col = 'orange', alpha = 0.5, cex = 0.75)+
           geom_abline(intercept = coef(fit2)[1],
-              slope = coef(fit2)[2])+
+              slope = coef(fit2)[2], col = "gray", lwd = 1.25)+
         labs(x = "GST", y = "ATMP")
 
 fit3 <- lm(data = delay3, ATMP ~ WVHT)
 p3 <- ggplot(data = delay3, aes(WVHT, ATMP))+
-          geom_point()+
+          geom_point(col = 'orange', alpha = 0.5, cex = 0.75)+
           geom_abline(intercept = coef(fit3)[1],
-              slope = coef(fit3)[2])+
+              slope = coef(fit3)[2], col = "gray", lwd = 1.25)+
         labs(x = "WVHT", y = "ATMP")
 
 fit4 <- lm(data = delay3, ATMP ~ DPD)
 p4 <- ggplot(data = delay3, aes(DPD, ATMP))+
-  geom_point()+
+  geom_point(col = 'orange', alpha = 0.5, cex = 0.75)+
   geom_abline(intercept = coef(fit4)[1],
-              slope = coef(fit4)[2])+
+              slope = coef(fit4)[2], col = "gray", lwd = 1.25)+
   labs(x = "DPD", y = "ATMP")
 
 
@@ -362,8 +364,8 @@ Plot the Date and Temperature, add smooth line to show the trends.
 ```{r echo=FALSE}
 #plot(delay$DATE,delay$ATMP,type = "l")
 ggplot(data = delay, aes(x = DATE, y = ATMP))+
-  geom_line()+
-  geom_smooth(method = lm, formula = y ~ x)
+  geom_line(col = 'orange', alpha = 0.5, cex = 0.75)+
+  geom_smooth(method = lm, formula = y ~ x, col = "gray", lwd = 1.25)
 
 ```
 
@@ -410,5 +412,4 @@ We can see the slop is small, but the p-value shows this coefficient is signific
 The temperature is raising by time!
 
 It can be seen from the figure and the slop coefficient that although the daily temperature increase is tiny, after 30 years of continuous accumulation, the global average temperature has risen by over 2 degrees, which means that the global temperature will rise by nearly 7 degrees within a century. This is a significant increment.
-
 

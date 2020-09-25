@@ -43,6 +43,16 @@ delay3  <-  summarise(planes3, WSPD = mean(WSPD, na.rm = TRUE),
                       ATMP = mean(ATMP, na.rm = TRUE), 
                       WTMP = mean(WTMP, na.rm = TRUE))
 
+planes4 <-  group_by(tmpdata, MONTH)
+delay4  <-  summarise(planes4, WSPD = mean(WSPD, na.rm = TRUE),
+                      GST = mean(GST, na.rm = TRUE), 
+                      WVHT = mean(WVHT, na.rm = TRUE), 
+                      DPD = mean(DPD, na.rm = TRUE),
+                      APD = mean(APD, na.rm = TRUE), 
+                      PRES = mean(PRES, na.rm = TRUE),
+                      ATMP = mean(ATMP, na.rm = TRUE), 
+                      WTMP = mean(WTMP, na.rm = TRUE))
+
 cor_de <- cor(delay3[,2:9])
 
 res_cor <- cor(cor_de)

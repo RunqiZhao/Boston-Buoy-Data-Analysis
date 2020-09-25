@@ -1,10 +1,10 @@
 # Boston-Buoy-Data-Analysis 
-# Runqi(Ricky) Zhao
+# Runqi(Ricky)Zhao
 URL link: https://github.com/RunqiZhao/Boston-Buoy-Data-Analysis
 
 Data download and combine(R.script): https://github.com/RunqiZhao/Boston-Buoy-Data-Analysis/blob/master/Data%20load%20and%20clean.R
 
-Saved data(RData):  
+Saved data(RData):  https://github.com/RunqiZhao/Boston-Buoy-Data-Analysis/blob/master/BuoyData.Rdata
 
 Date select and analysis(R.script): https://github.com/RunqiZhao/Boston-Buoy-Data-Analysis/blob/master/Data%20select%20and%20EDA.R
 

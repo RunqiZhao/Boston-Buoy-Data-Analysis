@@ -1,6 +1,7 @@
 # MA615 Boston-Buoy-Data-Analysis
 # Data select and EDA
-library(Rmisc)
+
+library(Rmisc) #rmisc first
 library(tidyverse)
 library(corrplot)
 library(lubridate)
@@ -120,9 +121,9 @@ ggplot(data = delay, aes(x = DATE, y = ATMP))+
 #plot(delay2$MONTH,delay2$WTMP,type = "l")
 
 
-year <- year(delay$MONTH)
-month <- month(delay$MONTH)
-aveTEM <- delay$ATMP
+year <- year(delay2$MONTH)
+month <- month(delay2$MONTH)
+aveTEM <- delay2$ATMP
 Tdata <- data.frame(year, month, aveTEM)
 names(Tdata) <- c("year","month","MeanTemp")
 
@@ -143,4 +144,4 @@ ggplot(data=Tdata, aes(x=year,y=month)) +
 
 # linear regression
 
- fit_month<-lm(data=delay2, ATMP~MONTH)
+ fit_month<-lm(data=delay3, ATMP~MONTH)

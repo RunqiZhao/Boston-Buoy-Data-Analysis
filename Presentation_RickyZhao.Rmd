@@ -1,0 +1,51 @@
+---
+title: "Boston-Buoy-Data-Analysis"
+author: "RickyZhao"
+date: "9/24/2020"
+output:
+  revealjs::revealjs_presentation:
+    theme: solarized
+    highlight: tango
+    transition: default
+    reveal_options:
+      slideNumber: true
+---
+
+
+
+```{r setup, include=FALSE}
+library(knitr)
+library(Rmisc)
+library(tidyverse)
+library(corrplot)
+library(lubridate)
+library(GGally)
+opts_chunk$set(echo = FALSE)
+```
+
+# Data load and clean
+
+## Download Data
+
+----
+123
+
+## Combine Data
+
+
+
+# Data select
+
+## By day
+
+## By month
+
+
+# Analysis
+
+## Temp vs. variables(Correlation)
+
+
+## Temp vs. Time
+
+

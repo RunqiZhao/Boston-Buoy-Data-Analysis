@@ -55,7 +55,7 @@ TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data1$hh))
 
 merge.data1 <- merge.data1[,-c(1:4)]
-merge.data1 <- cbind(DATE,MONTH,merge.data1)
+merge.data1 <- cbind(DATE,MONTH,TIME,merge.data1)
 ```
 
 ```{r}
@@ -74,7 +74,7 @@ MONTH <- round_date(DATE, "month")
 TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data2$hh))
 merge.data2 <- merge.data2[,-c(1:4)]
-merge.data2 <- cbind(DATE,MONTH,merge.data2)
+merge.data2 <- cbind(DATE,MONTH,TIME,merge.data2)
 
 # 00-04 original: 17 variables | data3 16 variables
 merge.data3 <-read_table2(urls[14],col_names = TRUE)
@@ -83,7 +83,6 @@ for (i in 15:18){
   merge.data3 <- rbind(merge.data3,new.data)
 }
 mm <- rep("00",nrow(merge.data3))
-
 DATE <- str_c(merge.data3$YYYY,merge.data3$MM,merge.data3$DD)
 DATE <- ymd(DATE)
 MONTH <- round_date(DATE, "month")
@@ -91,7 +90,7 @@ TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data3$hh))
 
 merge.data3 <- merge.data3[,-c(1:4)]
-merge.data3 <- cbind(DATE,MONTH,merge.data3)
+merge.data3 <- cbind(DATE,MONTH,TIME,merge.data3)
 
 
 # 05-06 original: 17 variables | data4 16 variables
@@ -108,7 +107,7 @@ TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data4$hh))
 
 merge.data4 <- merge.data4[,-c(1:5)]
-merge.data4 <- cbind(DATE,MONTH,merge.data4)
+merge.data4 <- cbind(DATE,MONTH,TIME,merge.data4)
 
 
 # 07-19 original: 17 variables | data5 16 variables
@@ -129,7 +128,7 @@ TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data5$hh))
 
 merge.data5 <- merge.data5[,-c(1:5)]
-merge.data5 <- cbind(DATE,MONTH,merge.data5)
+merge.data5 <- cbind(DATE,MONTH,TIME,merge.data5)
 ```
 
 ## Combine data frames.
@@ -163,11 +162,11 @@ TIDE <- rep(NA,nrow(data_87_99))
 data_87_99<-cbind(data_87_99,TIDE)
 
 WDIR <- rep(NA,nrow(data_87_99))
-data_87_99<-cbind(data_87_99[,1:3],WDIR,data_87_99[,4:15])
+data_87_99<-cbind(data_87_99[,1:4],WDIR,data_87_99[,5:16])
 WDIR <- rep(NA,nrow(data_00_06))
-data_00_06<-cbind(data_00_06[,1:3],WDIR,data_00_06[,4:15])
+data_00_06<-cbind(data_00_06[,1:4],WDIR,data_00_06[,5:16])
 WD <- rep(NA,nrow(data_07_19))
-data_07_19<-cbind(data_07_19[,1:2],WD,data_07_19[,3:15])
+data_07_19<-cbind(data_07_19[,1:3],WD,data_07_19[,4:16])
 ```
 
 ```{r}
@@ -233,7 +232,7 @@ load("BuoyData.Rdata")
 tmpdata  <-  data_87_19[ , !names(data_87_19) %in% c("WD","WDIR","MWD","VIS","TIDE","DEWP")]
 ```
 
-```{r}
+```{r warning=FALSE, include=FALSE}
 planes <-  group_by(tmpdata, DATE)
 delay  <-  summarise(planes, WSPD = mean(WSPD, na.rm = TRUE),
                      GST = mean(GST, na.rm = TRUE), 
@@ -258,7 +257,7 @@ delay2  <-  summarise(planes2, WSPD = mean(WSPD, na.rm = TRUE),
 
 Remove rows with NA, group the data by day(month), calculate the mean value of variables by day(month).
 
-```{r}
+```{r echo=TRUE, warning=FALSE}
 tmpdata  <-  na.omit(tmpdata)
 planes3 <-  group_by(tmpdata, DATE)
 delay3  <-  summarise(planes3, WSPD = mean(WSPD, na.rm = TRUE),
@@ -277,7 +276,7 @@ Delay3 is the data frame grouped by day.
 head(delay3,n=3)
 ```
 
-```{r}
+```{r echo=TRUE, warning=FALSE}
 planes4 <-  group_by(tmpdata, MONTH)
 delay4  <-  summarise(planes4, WSPD = mean(WSPD, na.rm = TRUE),
                       GST = mean(GST, na.rm = TRUE), 
@@ -299,10 +298,12 @@ head(delay4,n=3)
 
 We make plot correlation between these variables.
 
-```{r}
+```{r include=FALSE}
 cor_de <- cor(delay4[,2:9])
 res_cor <- cor(cor_de)
+```
 
+```{r}
 corrplot(corr = res_cor,order = "AOE",type="upper",method="pie",tl.pos = "d",tl.cex = 0.75,tl.col = "black")
 corrplot(corr = res_cor,add=TRUE, type="lower", method="number",order="AOE",diag=FALSE,tl.pos="n", cl.pos="n")
 
@@ -310,7 +311,7 @@ corrplot(corr = res_cor,add=TRUE, type="lower", method="number",order="AOE",diag
 
 Plot variables in matrix, we can find ATMP have high correlation with WSPD, GST, WVHT and DPD.
 
-```{r warning=TRUE, include=FALSE}
+```{r echo=FALSE, warning=FALSE}
 smdata <- data.frame(delay3[2:9])
 ggscatmat(smdata) + theme_bw(base_family = "STKaiti") +
   theme(plot.title = element_text(hjust = 0.5)) +
@@ -320,7 +321,7 @@ ggscatmat(smdata) + theme_bw(base_family = "STKaiti") +
 
 Plot the relationship between ATMP and WSPD, GST, WVHT and DPD with ggplot.
 
-```{r include=FALSE}
+```{r echo=FALSE}
 fit1 <- lm(data = delay3, ATMP ~ WSPD)
 p1 <- ggplot(data = delay3, aes(WSPD, ATMP))+
           geom_point()+
@@ -358,7 +359,7 @@ multiplot(p1, p2, p3, p4, cols = 2)
 
 Plot the Date and Temperature, add smooth line to show the trends.
 
-```{r include=FALSE}
+```{r echo=FALSE}
 #plot(delay$DATE,delay$ATMP,type = "l")
 ggplot(data = delay, aes(x = DATE, y = ATMP))+
   geom_line()+
@@ -368,10 +369,10 @@ ggplot(data = delay, aes(x = DATE, y = ATMP))+
 
 Plot a heatmap to show the trends of temperature with DATE.
 
-```{r warning=FALSE, include=FALSE}
-year <- year(delay$MONTH)
-month <- month(delay$MONTH)
-aveTEM <- delay$ATMP
+```{r echo=FALSE, warning=FALSE}
+year <- year(delay2$MONTH)
+month <- month(delay2$MONTH)
+aveTEM <- delay2$ATMP
 Tdata <- data.frame(year, month, aveTEM)
 names(Tdata) <- c("year","month","MeanTemp")
 
@@ -394,7 +395,7 @@ ggplot(data=Tdata, aes(x=year,y=month)) +
 Do regression of Temperature of DATE:
 
 ```{r}
-fit_date<-lm(data=delay, ATMP~DATE)
+fit_date<-lm(data=delay3, ATMP~DATE)
 summary(fit_date)
 ```
 

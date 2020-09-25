@@ -11,6 +11,7 @@ urls <- str_c(url1, years, url2, sep = "")
 # filenames <- str_c("mr", years,sep ="")
 
 #### read table
+## download data
 # 87-98 original: 16 variables | data1 15 variables
 merge.data1 <-read_table2(urls[1],col_names = TRUE)
 for (i in 2:12){
@@ -27,6 +28,7 @@ TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data1$hh))
 merge.data1 <- merge.data1[,-c(1:4)]
 merge.data1 <- cbind(DATE,MONTH,TIME,merge.data1)
+head(merge.data1)
 
 # 99 original: 16 variables | data2 15 variables
 merge.data2 <-read_table2(urls[13],col_names = TRUE)
@@ -38,6 +40,7 @@ TIME <- hms::hms(min= as.numeric(mm),
                  hours = as.numeric(merge.data2$hh))
 merge.data2 <- merge.data2[,-c(1:4)]
 merge.data2 <- cbind(DATE,MONTH,TIME,merge.data2)
+head(merge.data2)
 
 # 00-04 original: 17 variables | data3 16 variables
 merge.data3 <-read_table2(urls[14],col_names = TRUE)

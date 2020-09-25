@@ -51,9 +51,24 @@ corrplot(corr=res_cor)
 corrplot(corr = res_cor,order = "AOE",type="upper",method="pie",tl.pos = "d",tl.cex = 0.75,tl.col = "black")
 corrplot(corr = res_cor,add=TRUE, type="lower", method="number",order="AOE",diag=FALSE,tl.pos="n", cl.pos="n")
 
+## matrix plot #day
+## smdata <- data.frame(delay3[2:9])
+## ggscatmat(smdata) + theme_bw(base_family = "STKaiti") +
+## theme(plot.title = element_text(hjust = 0.5)) +
+## labs(x = "",y = "")
+
+# by month
+smdata <- data.frame(delay2[2:9])
+ggscatmat(smdata) + theme_bw(base_family = "STKaiti") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(x = "",y = "")
+
+## EXCEPT APD PRES ggplot
+
 #plot(delay$DATE,delay$ATMP,type = "l")
 ggplot(data = delay2, aes(x = MONTH, y = ATMP))+
-  geom_line()
+  geom_line()+
+  geom_smooth(method = lm, formula = y ~ x)
 
 #plot(delay$GST,delay$ATMP)
 #plot(delay2$MONTH,delay2$WTMP,type = "l")
@@ -69,7 +84,7 @@ names(Tdata) <- c("year","month","MeanTemp")
 ggplot(data=Tdata, aes(x=year,y=month)) + 
   theme_bw(base_family = "STKaiti") +
   geom_tile(aes(fill = MeanTemp),colour = "white") + 
- # geom_text(aes(label = round(MeanTemp,1))) +
+## geom_text(aes(label = round(MeanTemp,1))) +
   scale_fill_gradientn(colours=rev(RColorBrewer::brewer.pal(10,'Spectral'))) + 
   theme(legend.title=element_blank(),
         axis.title.y=element_blank(),
@@ -79,15 +94,6 @@ ggplot(data=Tdata, aes(x=year,y=month)) +
   labs(x="Year",y = "Month") +
   theme(plot.title = element_text(hjust = 0.5))
 
-## matrix plot #day
-smdata <- data.frame(delay3[2:9])
-ggscatmat(smdata) + theme_bw(base_family = "STKaiti") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "",y = "")
-# by month
-smdata <- data.frame(delay2[2:9])
-ggscatmat(smdata) + theme_bw(base_family = "STKaiti") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "",y = "")
+
 
 

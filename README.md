@@ -6,7 +6,7 @@ Data download and combine(R.script):
 
 Saved data(RData):  
 
-Date select and analysis(R.script):
+Date select and analysis(R.script): https://github.com/RunqiZhao/Boston-Buoy-Data-Analysis/blob/master/Data%20select%20and%20EDA.R
 
 HTML file: https://github.com/RunqiZhao/Boston-Buoy-Data-Analysis/blob/master/Boston-Buoy-Data-Analysis.html
 

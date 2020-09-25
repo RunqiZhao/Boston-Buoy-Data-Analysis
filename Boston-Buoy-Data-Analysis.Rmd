@@ -18,7 +18,7 @@ library(GGally)
 
 Download Historical data from NOAA National Data Buoy Center. Read data ofNDBC Station 44013, years from 1987 to 2019.
 Because these txt files have different column names, the initial data is separated into 5 data frames. 
-```{r}
+```{r include=FALSE}
 # echo=FALSE
 url1 <- "https://www.ndbc.noaa.gov/view_text_file.php?filename=44013h"
 url2 <- ".txt.gz&dir=data/historical/stdmet/"
@@ -26,7 +26,7 @@ years <- c(1987:2019)
 urls <- str_c(url1, years, url2, sep = "")
 
 # 87-98 original: 16 variables | data1 15 variables
-merge.data1 <-read_table2(urls[1],col_names = TRUE)
+merge.data1 <-read_table2(urls[1],col_names = TRUE,)
 for (i in 2:12){
   new.data <- read_table2(urls[i],col_names = TRUE)
   merge.data1 <- rbind(merge.data1,new.data)
@@ -111,10 +111,34 @@ merge.data5 <- merge.data5[,-c(1:5)]
 merge.data5 <- cbind(DATE,MONTH,TIME,merge.data5)
 ```
 
+Data of 1987-1998 (15 variables, first 6 lines)
+```{r echo=FALSE}
+head(merge.data1)
+```
+
+Data of 1999 (15 variables, first 6 lines)
+```{r echo=FALSE}
+head(merge.data2)
+```
+
+Data of 2000-2004 (16 variables, first 6 lines)
+```{r echo=FALSE}
+head(merge.data3)
+```
+
+Data of 2005-2006 (16 variables, first 6 lines)
+```{r echo=FALSE}
+head(merge.data4)
+```
+
+Data of 2007-2019(16 variables, first 6 lines)
+```{r echo=FALSE}
+head(merge.data4)
+```
 
 ## Combine data frames.
 
-```{r}
+```{r echo=FALSE}
 data_87_99 <- rbind(merge.data1,merge.data2)
 data_00_06 <- rbind(merge.data3,merge.data4)
 data_07_19 <- merge.data5
@@ -122,7 +146,7 @@ data_07_19 <- merge.data5
 
 Print the colnames to find the difference.
 
-```{r}
+```{r echo=FALSE}
 colnames(data_87_99)
 colnames(data_00_06)
 colnames(data_07_19)
@@ -130,14 +154,14 @@ colnames(data_07_19)
 
 From the defination, we find the "BAR" is the historic name of "PRES". Change the column name.
 
-```{r}
+```{r echo=TRUE}
 names(data_87_99)[names(data_87_99)=="BAR"]="PRES"
 names(data_00_06)[names(data_00_06)=="BAR"]="PRES"
 ```
 
-Add NA for TIDE, WDIR and WD for the data frame to make their names as each other.
+Add NA for TIDE, WDIR and WD for the data frame to make their names as each other. Then combine the data frames into one.
 
-```{r}
+```{r echo=TRUE}
 TIDE <- rep(NA,nrow(data_87_99))
 data_87_99<-cbind(data_87_99,TIDE)
 
@@ -153,23 +177,29 @@ data_87_19 <- rbind(data_87_99,data_00_06,data_07_19)
 
 ```
 
+```{r}
+str(data_87_19)
+```
+
 Conver the data from character into numeric.
+
+```{r echo=FALSE}
+for (i in 4:17){
+  data_87_19[,i] <- as.numeric(data_87_19[,i])
+}
+```
 
 ```{r}
 str(data_87_19)
+```
 
-for (i in 4:17){
-  data_87_19[,i] <- as.numeric(data_87_19[,i])
-  
-}
-str(data_87_19)
+```{r}
+summary(data_87_19,na.rm = TRUE)
 ```
 
 There are some data like "9999", "999", "99", there are actually NA. Replace them with NA. 
 
-```{r}
-summary(data_87_19,na.rm = TRUE)
-
+```{r echo=FALSE}
 data_87_19$WD[data_87_19$WD==999] <- NA
 data_87_19$WDIR[data_87_19$WDIR==999] <- NA
 data_87_19$WSPD[data_87_19$WSPD==99] <- NA
@@ -184,11 +214,16 @@ data_87_19$WTMP[data_87_19$WTMP==999] <- NA
 data_87_19$DEWP[data_87_19$DEWP==999] <- NA
 data_87_19$VIS[data_87_19$VIS==99] <- NA
 data_87_19$TIDE[data_87_19$TIDE==99] <- NA
-summary(data_87_19,na.rm = TRUE)
 
 ```
+
+```{r}
+summary(data_87_19,na.rm = TRUE)
+```
+
 
 Save data as BuoyData.Rdata
 ```{r}
 save(data_87_19,file='BuoyData.Rdata')
 ```
+

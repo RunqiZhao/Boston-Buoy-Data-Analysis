@@ -11,7 +11,7 @@ load("BuoyData.Rdata")
 tmpdata  <-  data_87_19[ , !names(data_87_19) %in% c("WD","WDIR","MWD","VIS","TIDE","DEWP")]
 
 
-
+# delay: mean by day with NA
 planes <-  group_by(tmpdata, DATE)
 delay  <-  summarise(planes, WSPD = mean(WSPD, na.rm = TRUE),
                      GST = mean(GST, na.rm = TRUE), 
@@ -22,7 +22,7 @@ delay  <-  summarise(planes, WSPD = mean(WSPD, na.rm = TRUE),
                      ATMP = mean(ATMP, na.rm = TRUE), 
                      WTMP = mean(WTMP, na.rm = TRUE))
 
-
+# delay2: mean by month with NA
 planes2 <-  group_by(tmpdata, MONTH)
 delay2  <-  summarise(planes2, WSPD = mean(WSPD, na.rm = TRUE),
                       GST = mean(GST, na.rm = TRUE), 
@@ -33,6 +33,7 @@ delay2  <-  summarise(planes2, WSPD = mean(WSPD, na.rm = TRUE),
                       ATMP = mean(ATMP, na.rm = TRUE), 
                       WTMP = mean(WTMP, na.rm = TRUE))
 
+# delay3: mean by day without NA
 tmpdata  <-  na.omit(tmpdata)
 planes3 <-  group_by(tmpdata, DATE)
 delay3  <-  summarise(planes3, WSPD = mean(WSPD, na.rm = TRUE),
@@ -44,6 +45,7 @@ delay3  <-  summarise(planes3, WSPD = mean(WSPD, na.rm = TRUE),
                       ATMP = mean(ATMP, na.rm = TRUE), 
                       WTMP = mean(WTMP, na.rm = TRUE))
 
+# delay4: mean by month without NA
 planes4 <-  group_by(tmpdata, MONTH)
 delay4  <-  summarise(planes4, WSPD = mean(WSPD, na.rm = TRUE),
                       GST = mean(GST, na.rm = TRUE), 
@@ -54,8 +56,10 @@ delay4  <-  summarise(planes4, WSPD = mean(WSPD, na.rm = TRUE),
                       ATMP = mean(ATMP, na.rm = TRUE), 
                       WTMP = mean(WTMP, na.rm = TRUE))
 
+
 # correlation
-cor_de <- cor(delay4[,2:9])
+# plot
+cor_de <- cor(delay3[,2:9])
 res_cor <- cor(cor_de)
 corrplot(corr=res_cor)
 
@@ -108,7 +112,7 @@ multiplot(p1, p2, p3, p4, cols = 2)
 
 
 #plot(delay$DATE,delay$ATMP,type = "l")
-ggplot(data = delay2, aes(x = MONTH, y = ATMP))+
+ggplot(data = delay, aes(x = DATE, y = ATMP))+
   geom_line()+
   geom_smooth(method = lm, formula = y ~ x)
 
@@ -138,4 +142,5 @@ ggplot(data=Tdata, aes(x=year,y=month)) +
 
 
 
-
+ fit_day<-lm(data=delay3, ATMP~DATE)
+ fit_MONTH<-lm(data=delay4, ATMP~MONTH)

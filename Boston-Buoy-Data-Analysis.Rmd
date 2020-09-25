@@ -27,6 +27,7 @@ urls <- str_c(url1, years, url2, sep = "")
 
 Because these txt files have different column names, the initial data is separated into 5 data frames.
 Take 1987 - 1998 as example. Their original column names are:
+
 ```{r include=FALSE}
 # 87-98 original: 16 variables | data1 15 variables
 merge.data1 <-read_table2(urls[1],col_names = TRUE)
@@ -61,6 +62,7 @@ colnames(merge.data1)
 ```
 
 Do the same with the next 4 data frames.
+
 ```{r include=FALSE}
 # 99 original: 16 variables | data2 15 variables
 merge.data2 <-read_table2(urls[13],col_names = TRUE)
@@ -130,7 +132,9 @@ merge.data5 <- cbind(DATE,MONTH,merge.data5)
 ```
 
 ## Combine data frames.
+
 After change the date and time variables, we can combine 5 data frames into 3. Print the column names to find the difference.
+
 ```{r echo=FALSE}
 data_87_99 <- rbind(merge.data1,merge.data2)
 data_00_06 <- rbind(merge.data3,merge.data4)
@@ -191,7 +195,6 @@ There are some data like "9999", "999", "99", which seems impossible value. They
 summary(data_87_19,na.rm = TRUE)
 ```
 
-
 ```{r echo=FALSE}
 data_87_19$WD[data_87_19$WD==999] <- NA
 data_87_19$WDIR[data_87_19$WDIR==999] <- NA
@@ -214,24 +217,72 @@ data_87_19$TIDE[data_87_19$TIDE==99] <- NA
 summary(data_87_19,na.rm = TRUE)
 ```
 
-
 Save data as BuoyData.Rdata
+
 ```{r}
 save(data_87_19,file='BuoyData.Rdata')
 ```
 
-# Data Select
+## Data Select
 
+According to the summary, there are over 10,000 NAs in variables "WD", "WDIR", "MWD", "VIS", "TIDE" and "DEWP", so we select other variables from the data frame.
 
+```{r include=FALSE}
+load("BuoyData.Rdata")
+tmpdata  <-  data_87_19[ , !names(data_87_19) %in% c("WD","WDIR","MWD","VIS","TIDE","DEWP")]
+```
 
+Remove rows with NA, group the data by day(month), calculate the mean value of variables by day(month).
 
+```{r}
+tmpdata  <-  na.omit(tmpdata)
+planes3 <-  group_by(tmpdata, DATE)
+delay3  <-  summarise(planes3, WSPD = mean(WSPD, na.rm = TRUE),
+                      GST = mean(GST, na.rm = TRUE), 
+                      WVHT = mean(WVHT, na.rm = TRUE), 
+                      DPD = mean(DPD, na.rm = TRUE),
+                      APD = mean(APD, na.rm = TRUE), 
+                      PRES = mean(PRES, na.rm = TRUE),
+                      ATMP = mean(ATMP, na.rm = TRUE), 
+                      WTMP = mean(WTMP, na.rm = TRUE))
+```
 
+Delay3 is the data frame grouped by day.
 
+```{r}
+head(delay3,n=3)
+```
 
+```{r}
+planes4 <-  group_by(tmpdata, MONTH)
+delay4  <-  summarise(planes4, WSPD = mean(WSPD, na.rm = TRUE),
+                      GST = mean(GST, na.rm = TRUE), 
+                      WVHT = mean(WVHT, na.rm = TRUE), 
+                      DPD = mean(DPD, na.rm = TRUE),
+                      APD = mean(APD, na.rm = TRUE), 
+                      PRES = mean(PRES, na.rm = TRUE),
+                      ATMP = mean(ATMP, na.rm = TRUE), 
+                      WTMP = mean(WTMP, na.rm = TRUE))
+```
 
+Delay4 is the data frame grouped by month.
 
+```{r}
+head(delay4,n=3)
+```
 
+## Correlation between different variables
 
+We make plot correlation between these variables.
+
+```{r}
+cor_de <- cor(delay4[,2:9])
+res_cor <- cor(cor_de)
+
+corrplot(corr = res_cor,order = "AOE",type="upper",method="pie",tl.pos = "d",tl.cex = 0.75,tl.col = "black")
+corrplot(corr = res_cor,add=TRUE, type="lower", method="number",order="AOE",diag=FALSE,tl.pos="n", cl.pos="n")
+
+```
 
 
 

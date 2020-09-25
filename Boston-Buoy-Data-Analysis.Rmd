@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 library(knitr)
 opts_chunk$set(echo = TRUE)
+library(Rmisc)
 library(tidyverse)
 library(corrplot)
 library(lubridate)
@@ -232,6 +233,29 @@ load("BuoyData.Rdata")
 tmpdata  <-  data_87_19[ , !names(data_87_19) %in% c("WD","WDIR","MWD","VIS","TIDE","DEWP")]
 ```
 
+```{r}
+planes <-  group_by(tmpdata, DATE)
+delay  <-  summarise(planes, WSPD = mean(WSPD, na.rm = TRUE),
+                     GST = mean(GST, na.rm = TRUE), 
+                     WVHT = mean(WVHT, na.rm = TRUE), 
+                     DPD = mean(DPD, na.rm = TRUE),
+                     APD = mean(APD, na.rm = TRUE), 
+                     PRES = mean(PRES, na.rm = TRUE),
+                     ATMP = mean(ATMP, na.rm = TRUE), 
+                     WTMP = mean(WTMP, na.rm = TRUE))
+
+# delay2: mean by month with NA
+planes2 <-  group_by(tmpdata, MONTH)
+delay2  <-  summarise(planes2, WSPD = mean(WSPD, na.rm = TRUE),
+                      GST = mean(GST, na.rm = TRUE), 
+                      WVHT = mean(WVHT, na.rm = TRUE), 
+                      DPD = mean(DPD, na.rm = TRUE),
+                      APD = mean(APD, na.rm = TRUE), 
+                      PRES = mean(PRES, na.rm = TRUE),
+                      ATMP = mean(ATMP, na.rm = TRUE), 
+                      WTMP = mean(WTMP, na.rm = TRUE))
+```
+
 Remove rows with NA, group the data by day(month), calculate the mean value of variables by day(month).
 
 ```{r}
@@ -284,14 +308,106 @@ corrplot(corr = res_cor,add=TRUE, type="lower", method="number",order="AOE",diag
 
 ```
 
+Plot variables in matrix, we can find ATMP have high correlation with WSPD, GST, WVHT and DPD.
+
+```{r warning=TRUE, include=FALSE}
+smdata <- data.frame(delay3[2:9])
+ggscatmat(smdata) + theme_bw(base_family = "STKaiti") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(x = "",y = "")
+
+```
+
+Plot the relationship between ATMP and WSPD, GST, WVHT and DPD with ggplot.
+
+```{r include=FALSE}
+fit1 <- lm(data = delay3, ATMP ~ WSPD)
+p1 <- ggplot(data = delay3, aes(WSPD, ATMP))+
+          geom_point()+
+          geom_abline(intercept = coef(fit1)[1],
+                    slope = coef(fit1)[2])+
+        labs(x = "WSPD", y = "ATMP")
+
+fit2 <- lm(data = delay3, ATMP ~ GST)
+p2 <- ggplot(data = delay3, aes(GST, ATMP))+
+          geom_point()+
+          geom_abline(intercept = coef(fit2)[1],
+              slope = coef(fit2)[2])+
+        labs(x = "GST", y = "ATMP")
+
+fit3 <- lm(data = delay3, ATMP ~ WVHT)
+p3 <- ggplot(data = delay3, aes(WVHT, ATMP))+
+          geom_point()+
+          geom_abline(intercept = coef(fit3)[1],
+              slope = coef(fit3)[2])+
+        labs(x = "WVHT", y = "ATMP")
+
+fit4 <- lm(data = delay3, ATMP ~ DPD)
+p4 <- ggplot(data = delay3, aes(DPD, ATMP))+
+  geom_point()+
+  geom_abline(intercept = coef(fit4)[1],
+              slope = coef(fit4)[2])+
+  labs(x = "DPD", y = "ATMP")
 
 
+multiplot(p1, p2, p3, p4, cols = 2)
 
+```
 
+# Time and Temperature
 
+Plot the Date and Temperature, add smooth line to show the trends.
 
+```{r include=FALSE}
+#plot(delay$DATE,delay$ATMP,type = "l")
+ggplot(data = delay, aes(x = DATE, y = ATMP))+
+  geom_line()+
+  geom_smooth(method = lm, formula = y ~ x)
 
+```
 
+Plot a heatmap to show the trends of temperature with DATE.
 
+```{r warning=FALSE, include=FALSE}
+year <- year(delay$MONTH)
+month <- month(delay$MONTH)
+aveTEM <- delay$ATMP
+Tdata <- data.frame(year, month, aveTEM)
+names(Tdata) <- c("year","month","MeanTemp")
+
+# heat map
+ggplot(data=Tdata, aes(x=year,y=month)) + 
+  theme_bw(base_family = "STKaiti") +
+  geom_tile(aes(fill = MeanTemp),colour = "white") + 
+## geom_text(aes(label = round(MeanTemp,1))) +
+  scale_fill_gradientn(colours=rev(RColorBrewer::brewer.pal(10,'Spectral'))) + 
+  theme(legend.title=element_blank(),
+        axis.title.y=element_blank(),
+        axis.title.x=element_blank(),
+        legend.position="top") + 
+  ggtitle("Mean Temp") +
+  labs(x="Year",y = "Month") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+Do regression of Temperature of DATE:
+
+```{r}
+fit_date<-lm(data=delay, ATMP~DATE)
+summary(fit_date)
+```
+
+```{r}
+coef(fit_date)
+```
+
+We can see the slop is small, but the p-value shows this coefficient is significantly different from zero!
+
+## Conclusion
+
+The temperature is raising by time!
+
+It can be seen from the figure and the slop coefficient that although the daily temperature increase is tiny, after 30 years of continuous accumulation, the global average temperature has risen by over 2 degrees, which means that the global temperature will rise by nearly 7 degrees within a century. This is a significant increment.
 
 

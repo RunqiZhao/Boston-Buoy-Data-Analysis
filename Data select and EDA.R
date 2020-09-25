@@ -73,7 +73,7 @@ corrplot(corr = res_cor,add=TRUE, type="lower", method="number",order="AOE",diag
 ## labs(x = "",y = "")
 
 # by month
-smdata <- data.frame(delay4[2:9])
+smdata <- data.frame(delay3[2:9])
 ggscatmat(smdata) + theme_bw(base_family = "STKaiti") +
   theme(plot.title = element_text(hjust = 0.5)) +
   labs(x = "",y = "")
@@ -86,21 +86,21 @@ p1 <- ggplot(data = delay3, aes(WSPD, ATMP))+
                     slope = coef(fit1)[2])+
         labs(x = "WSPD", y = "ATMP")
 
-fit2 <- lm(data = delay4, ATMP ~ GST)
+fit2 <- lm(data = delay3, ATMP ~ GST)
 p2 <- ggplot(data = delay4, aes(GST, ATMP))+
           geom_point()+
           geom_abline(intercept = coef(fit2)[1],
               slope = coef(fit2)[2])+
         labs(x = "GST", y = "ATMP")
 
-fit3 <- lm(data = delay4, ATMP ~ WVHT)
+fit3 <- lm(data = delay3, ATMP ~ WVHT)
 p3 <- ggplot(data = delay4, aes(WVHT, ATMP))+
           geom_point()+
           geom_abline(intercept = coef(fit3)[1],
               slope = coef(fit3)[2])+
         labs(x = "WVHT", y = "ATMP")
 
-fit4 <- lm(data = delay4, ATMP ~ DPD)
+fit4 <- lm(data = delay3, ATMP ~ DPD)
 p4 <- ggplot(data = delay4, aes(DPD, ATMP))+
   geom_point()+
   geom_abline(intercept = coef(fit4)[1],
@@ -120,9 +120,9 @@ ggplot(data = delay, aes(x = DATE, y = ATMP))+
 #plot(delay2$MONTH,delay2$WTMP,type = "l")
 
 
-year <- year(delay2$MONTH)
-month <- month(delay2$MONTH)
-aveTEM <- delay2$ATMP
+year <- year(delay$MONTH)
+month <- month(delay$MONTH)
+aveTEM <- delay$ATMP
 Tdata <- data.frame(year, month, aveTEM)
 names(Tdata) <- c("year","month","MeanTemp")
 
@@ -141,6 +141,6 @@ ggplot(data=Tdata, aes(x=year,y=month)) +
   theme(plot.title = element_text(hjust = 0.5))
 
 
+# linear regression
 
- fit_day<-lm(data=delay3, ATMP~DATE)
- fit_MONTH<-lm(data=delay4, ATMP~MONTH)
+ fit_month<-lm(data=delay2, ATMP~MONTH)

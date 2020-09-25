@@ -1,5 +1,5 @@
 # Boston-Buoy-Data-Analysis 
-# Runqi(Ricky)Zhao
+## Runqi(Ricky)Zhao
 URL link: https://github.com/RunqiZhao/Boston-Buoy-Data-Analysis
 
 Data download and combine(R.script): https://github.com/RunqiZhao/Boston-Buoy-Data-Analysis/blob/master/Data%20load%20and%20clean.R

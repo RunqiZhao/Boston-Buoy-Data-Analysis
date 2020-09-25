@@ -4,6 +4,7 @@ library(tidyverse)
 library(corrplot)
 library(lubridate)
 library(GGally)
+library(Rmisc)
 
 load("BuoyData.Rdata")
 tmpdata  <-  data_87_19[ , !names(data_87_19) %in% c("WD","WDIR","MWD","VIS","TIDE","DEWP")]
@@ -19,7 +20,6 @@ delay  <-  summarise(planes, WSPD = mean(WSPD, na.rm = TRUE),
                      PRES = mean(PRES, na.rm = TRUE),
                      ATMP = mean(ATMP, na.rm = TRUE), 
                      WTMP = mean(WTMP, na.rm = TRUE))
-# delay$DATE[2]-delay$DATE[1] == 1
 
 
 planes2 <-  group_by(tmpdata, MONTH)
@@ -43,11 +43,23 @@ delay3  <-  summarise(planes3, WSPD = mean(WSPD, na.rm = TRUE),
                       ATMP = mean(ATMP, na.rm = TRUE), 
                       WTMP = mean(WTMP, na.rm = TRUE))
 
-cor_de <- cor(delay3[,2:9])
+planes4 <-  group_by(tmpdata, MONTH)
+delay4  <-  summarise(planes4, WSPD = mean(WSPD, na.rm = TRUE),
+                      GST = mean(GST, na.rm = TRUE), 
+                      WVHT = mean(WVHT, na.rm = TRUE), 
+                      DPD = mean(DPD, na.rm = TRUE),
+                      APD = mean(APD, na.rm = TRUE), 
+                      PRES = mean(PRES, na.rm = TRUE),
+                      ATMP = mean(ATMP, na.rm = TRUE), 
+                      WTMP = mean(WTMP, na.rm = TRUE))
+
+
+# correlation
+cor_de <- cor(delay4[,2:9])
 
 res_cor <- cor(cor_de)
 corrplot(corr=res_cor)
-# correlation
+
 corrplot(corr = res_cor,order = "AOE",type="upper",method="pie",tl.pos = "d",tl.cex = 0.75,tl.col = "black")
 corrplot(corr = res_cor,add=TRUE, type="lower", method="number",order="AOE",diag=FALSE,tl.pos="n", cl.pos="n")
 
@@ -58,12 +70,43 @@ corrplot(corr = res_cor,add=TRUE, type="lower", method="number",order="AOE",diag
 ## labs(x = "",y = "")
 
 # by month
-smdata <- data.frame(delay2[2:9])
+smdata <- data.frame(delay4[2:9])
 ggscatmat(smdata) + theme_bw(base_family = "STKaiti") +
   theme(plot.title = element_text(hjust = 0.5)) +
   labs(x = "",y = "")
 
-## EXCEPT APD PRES ggplot
+## plot selected coefficient verses ATMP 
+fit1 <- lm(data = delay4, ATMP ~ WSPD)
+p1 <- ggplot(data = delay4, aes(WSPD, ATMP))+
+          geom_point()+
+          geom_abline(intercept = coef(fit1)[1],
+                    slope = coef(fit1)[2])+
+        labs(x = "WSPD", y = "ATMP")
+
+fit2 <- lm(data = delay4, ATMP ~ GST)
+p2 <- ggplot(data = delay4, aes(GST, ATMP))+
+          geom_point()+
+          geom_abline(intercept = coef(fit2)[1],
+              slope = coef(fit2)[2])+
+        labs(x = "GST", y = "ATMP")
+
+fit3 <- lm(data = delay4, ATMP ~ WVHT)
+p3 <- ggplot(data = delay4, aes(WVHT, ATMP))+
+          geom_point()+
+          geom_abline(intercept = coef(fit3)[1],
+              slope = coef(fit3)[2])+
+        labs(x = "WVHT", y = "ATMP")
+
+fit4 <- lm(data = delay4, ATMP ~ DPD)
+p4 <- ggplot(data = delay4, aes(DPD, ATMP))+
+  geom_point()+
+  geom_abline(intercept = coef(fit4)[1],
+              slope = coef(fit4)[2])+
+  labs(x = "DPD", y = "ATMP")
+
+
+multiplot(p1, p2, p3, p4, cols = 2)
+
 
 #plot(delay$DATE,delay$ATMP,type = "l")
 ggplot(data = delay2, aes(x = MONTH, y = ATMP))+
